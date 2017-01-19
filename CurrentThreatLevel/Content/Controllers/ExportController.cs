@@ -25,7 +25,10 @@ namespace CurrentThreatLevel.Content.Controllers
             {
                 MagickColor mTextColor = new MagickColor("#" + imageDefinition.textColor);
 
-                int textOffset = imageHeight / 3;
+                System.Drawing.Point textOffset = new System.Drawing.Point();
+
+                textOffset.X = 64;
+                textOffset.Y = imageHeight / 3;
 
                 new Drawables()
                     .FillColor(mTextColor)
@@ -35,10 +38,10 @@ namespace CurrentThreatLevel.Content.Controllers
                     .TextAlignment(TextAlignment.Left)
 
                     .FontPointSize(28)
-                    .Text(64, textOffset, "current threat level is " + imageDefinition.threatLevel)
+                    .Text(textOffset.X, textOffset.Y, "current threat level is " + imageDefinition.threatLevel)
 
                     .FontPointSize(20)
-                    .Text(64, textOffset * 2, imageDefinition.text)
+                    .Text(textOffset.X, textOffset.Y * 2, imageDefinition.text)
 
                     .Draw(image);
 
