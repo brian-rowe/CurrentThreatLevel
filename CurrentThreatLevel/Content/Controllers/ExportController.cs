@@ -11,15 +11,15 @@ namespace CurrentThreatLevel.Content.Controllers
     public class ExportController : ApiController
     {
         // POST: api/Export
-        public HttpResponseMessage Get(string bgColor, string textColor, string text, string threatLevel)
+        public HttpResponseMessage Get([FromUri]Models.CurrentThreatImage imageDefinition) 
         {
             HttpResponseMessage result = null;
 
             System.IO.Stream memStream = new System.IO.MemoryStream();
 
-            using (MagickImage image = new MagickImage(new MagickColor("#" + bgColor), 828, 315))
+            using (MagickImage image = new MagickImage(new MagickColor("#" + imageDefinition.bgColor), 828, 315))
             {
-                MagickColor mTextColor = new MagickColor("#" + textColor);
+                MagickColor mTextColor = new MagickColor("#" + imageDefinition.textColor);
 
                 new Drawables()
                     .FillColor(mTextColor)
@@ -29,10 +29,10 @@ namespace CurrentThreatLevel.Content.Controllers
                     .TextAlignment(TextAlignment.Left)
 
                     .FontPointSize(28)
-                    .Text(64, 105, "current threat level is " + threatLevel)
+                    .Text(64, 105, "current threat level is " + imageDefinition.threatLevel)
 
                     .FontPointSize(20)
-                    .Text(64, 210, text)
+                    .Text(64, 210, imageDefinition.text)
 
                     .Draw(image);
 
@@ -47,7 +47,7 @@ namespace CurrentThreatLevel.Content.Controllers
             result = Request.CreateResponse(HttpStatusCode.OK);
             result.Content = new StreamContent(memStream);
             result.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
-            result.Content.Headers.ContentDisposition.FileName = this.getFileName(threatLevel, text) + ".png";
+            result.Content.Headers.ContentDisposition.FileName = this.getFileName(imageDefinition.threatLevel, imageDefinition.text) + ".png";
 
             System.Web.HttpContext.Current.Response.SetCookie(new System.Web.HttpCookie("fileDownload", "true") { Path = "/" });
 
