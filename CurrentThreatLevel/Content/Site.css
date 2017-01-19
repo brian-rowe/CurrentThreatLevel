@@ -76,11 +76,6 @@ textarea:focus {
   color: inherit;
 }
 
-/* Attempt to style scrollbars */
-body::-webkit-scrollbar-thumb {
-    background-color: blue;
-}
-
 /* Less... */
 @media all and (max-width: 768px) {
     body {

@@ -43,11 +43,20 @@
                 });
             });
 
+            function addRuleToDynamicStyleSheet(selector, rule) {
+                if ('addRule' in dynamicStyleSheet) {
+                    dynamicStyleSheet.addRule(selector, rule, 0);
+                    return;
+                }
+   
+                dynamicStyleSheet.insertRule(selector + '{' + rule + '}', dynamicStyleSheet.cssRules.length);
+            }
+
             function changeBackgroundColor(hexColor) {
                 $('body').css('backgroundColor', hexColor);
 
                 /* the 'select option' selector won't accept 'background-color: inherit;' for some reason */
-                dynamicStyleSheet.addRule('select option', 'background-color:' + hexColor + ';', 0);
+                addRuleToDynamicStyleSheet('select option', 'background-color:' + hexColor + ';');
             }
 
             function changeColors(hexColor) {
@@ -64,6 +73,12 @@
 
             function clearDynamicStyleSheet() {
                 var rules = dynamicStyleSheet.rules;
+
+                // Firefox gets undefined instead of an empty array here, so dump out for that case */
+                if (!rules) {
+                    return;
+                }
+
                 var length = rules.length;
 
                 /* Don't attempt to remove rules if there aren't any, you'll get red text */
