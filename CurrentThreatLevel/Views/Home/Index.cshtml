@@ -1,0 +1,144 @@
+﻿<div>
+    <label for="threatColor">current threat level is</label>
+    <select id="threatColor"></select>
+</div>
+
+<div>
+    <input id="threatText" placeholder="enter text..." />
+</div>
+
+<div>
+    <button type="button" id="submit">
+        generate image
+    </button>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        (function ($) {
+            var select = $('#threatColor');
+
+            var dynamicStyleSheet = createDynamicStyleSheet();
+
+            $(document).ready(function () {
+                getColors().success(function (colors) {
+                    changeColors(colors[0].hex);
+                    populateColorSelect(colors);
+                    watchSelectChange();
+                }).fail(function (err) {
+                    console.log(err);
+                })
+            });
+
+            $('#submit').click(function () {
+                $.fileDownload('/api/export?' + $.param({
+                    threatLevel: $('#threatColor option:selected').text(),
+                    text: $('#threatText').val(),
+                    bgColor: rgb2hex($('body').css('backgroundColor')),
+                    textColor: rgb2hex($('body').css('color'))
+                })).done(function () {
+                    console.log('download success');
+                }).fail(function () {
+                    console.log('failfailfail');
+                });
+            });
+
+            function changeBackgroundColor(hexColor) {
+                $('body').css('backgroundColor', hexColor);
+
+                /* the 'select option' selector won't accept 'background-color: inherit;' for some reason */
+                dynamicStyleSheet.addRule('select option', 'background-color:' + hexColor + ';', 0);
+            }
+
+            function changeColors(hexColor) {
+                clearDynamicStyleSheet();
+                changeBackgroundColor(hexColor);
+                changeTextColor(hexColor);
+            }
+
+            function changeTextColor(hexColor) {
+                var contrastColor = getTextColor(hexColor);
+
+                $('body').css('color', getTextColor(hexColor));
+            }
+
+            function clearDynamicStyleSheet() {
+                var rules = dynamicStyleSheet.rules;
+                var length = rules.length;
+
+                /* Don't attempt to remove rules if there aren't any, you'll get red text */
+                if (!length) {
+                    return;
+                }
+
+                /* Start from the back so we don't mess up the indexes as we go */
+                for (var i = length - 1; i >= 0; i--) {
+                    dynamicStyleSheet.removeRule(i);
+                }
+            }
+
+            function createDynamicStyleSheet() {
+                var style = document.createElement('style');
+
+                // Add a media (and/or media query) here if you'd like!
+                // style.setAttribute("media", "screen")
+                // style.setAttribute("media", "only screen and (max-width : 1024px)")
+
+                // WebKit hack :(
+                style.appendChild(document.createTextNode(""));
+
+                // Add the <style> element to the page
+                document.head.appendChild(style);
+
+                return style.sheet;
+            }
+
+            function getColors() {
+                return $.getJSON('/api/colors');
+            }
+
+            /**
+            * Stolen from StackOverflow because laziness.
+            * http://stackoverflow.com/questions/3942878/how-to-decide-font-color-in-white-or-black-depending-on-background-color
+            */
+            function getTextColor(bgColor) {
+                var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
+                var r = parseInt(color.substring(0, 2), 16); // hexToR
+                var g = parseInt(color.substring(2, 4), 16); // hexToG
+                var b = parseInt(color.substring(4, 6), 16); // hexToB
+                return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ?
+                    'black' : 'white';
+            }
+
+            function populateColorSelect(colors) {
+                var options = [];
+                var currentColor;
+                
+                for(var color in colors) {
+                    currentColor = colors[color]; // since they come back as an array of objects
+                    options.push('<option value="' + currentColor.hex + '">' + currentColor.readableName + '</option>');
+                }
+
+                select.append(options);
+            }
+
+            /*
+             * Also stolen because lazy
+             * http://wowmotty.blogspot.com/2009/06/convert-jquery-rgb-output-to-hex-color.html
+             */
+            function rgb2hex(orig) {
+                var rgb = orig.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+)/i);
+                return (rgb && rgb.length === 4) ?
+                 ("0" + parseInt(rgb[1], 10).toString(16)).slice(-2) +
+                 ("0" + parseInt(rgb[2], 10).toString(16)).slice(-2) +
+                 ("0" + parseInt(rgb[3], 10).toString(16)).slice(-2) : orig;
+            }
+
+            function watchSelectChange() {
+                select.change(function () {
+                    changeColors(select.val());
+                })
+            }
+        })(jQuery);
+    </script>    
+}

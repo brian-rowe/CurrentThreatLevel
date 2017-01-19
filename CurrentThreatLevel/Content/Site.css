@@ -1,0 +1,85 @@
+﻿/* Max the height! */
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Times New Roman';
+    font-weight: bold;
+    font-size: 48px;
+}
+
+.body-content {
+    /* Set padding to keep content from hitting the edges */
+    padding: 0 20%;
+
+    /* Evenly space the options */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 100%;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+button,
+input,
+select,
+textarea {
+    /* Set background-color so everything remains the same color as the body */
+    background-color: inherit;
+
+    /* Consistent borders */
+    border-radius: 8px;
+    border: 1px solid;
+
+    box-sizing: border-box;
+
+    /* Keep the text the same */
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+
+    /* Responsive */
+    max-width: 100%;
+    
+    /* Give it some room to breathe... */
+    padding: 12px;
+
+    /* Everything is big. */
+    line-height: 60px;
+}
+
+button, select {
+    cursor: pointer;
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+}
+
+/* Make all of the placeholders the same color as their surroundings */
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: inherit;
+  opacity: 0.4;
+}
+
+::-moz-placeholder { /* Firefox 19+ */
+  color: inherit;
+}
+
+:-ms-input-placeholder { /* IE 10+ */
+  color: inherit;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+  color: inherit;
+}
+
+/* Attempt to style scrollbars */
+body::-webkit-scrollbar-thumb {
+    background-color: blue;
+}
