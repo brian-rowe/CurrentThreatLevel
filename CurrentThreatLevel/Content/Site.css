@@ -45,9 +45,6 @@ textarea {
     
     /* Give it some room to breathe... */
     padding: 12px;
-
-    /* Everything is big. */
-    line-height: 60px;
 }
 
 button, select {
@@ -82,4 +79,15 @@ textarea:focus {
 /* Attempt to style scrollbars */
 body::-webkit-scrollbar-thumb {
     background-color: blue;
+}
+
+/* Less... */
+@media all and (max-width: 768px) {
+    body {
+        font-size: 24px;
+    }
+
+    button, input, select, textarea {
+        padding: 6px;
+    }
 }

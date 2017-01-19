@@ -10,7 +10,7 @@ namespace CurrentThreatLevel.Controllers
     {
         public ActionResult Index()
         {
-            ViewBag.Title = "Home Page";
+            ViewBag.Title = "Current Threat Level";
 
             return View();
         }
