@@ -47,11 +47,22 @@ namespace CurrentThreatLevel.Content.Controllers
             result = Request.CreateResponse(HttpStatusCode.OK);
             result.Content = new StreamContent(memStream);
             result.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
-            result.Content.Headers.ContentDisposition.FileName = string.Join("_", (threatLevel + ' ' + text).Split(' ')) + ".png";
+            result.Content.Headers.ContentDisposition.FileName = this.getFileName(threatLevel, text) + ".png";
 
             System.Web.HttpContext.Current.Response.SetCookie(new System.Web.HttpCookie("fileDownload", "true") { Path = "/" });
 
             return result;
+        }
+
+        private string getFileName(string threatLevel, string text)
+        {
+            string baseText = threatLevel + ' ' + text;
+
+            // Strip punctuation
+            string stripped_version = new string(baseText.Where(c => !char.IsPunctuation(c)).ToArray()).ToLower();
+
+            // Replace all spaces with underscores;
+            return string.Join("_", stripped_version.Split(' '));
         }
     }
 }
