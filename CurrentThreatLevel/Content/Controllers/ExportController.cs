@@ -13,13 +13,19 @@ namespace CurrentThreatLevel.Content.Controllers
         // POST: api/Export
         public HttpResponseMessage Get([FromUri]Models.CurrentThreatImage imageDefinition) 
         {
-            HttpResponseMessage result = null;
+            HttpResponseMessage response = null;
 
+            /* Conduit for getting the image into the response content */
             System.IO.Stream memStream = new System.IO.MemoryStream();
 
-            using (MagickImage image = new MagickImage(new MagickColor("#" + imageDefinition.bgColor), 828, 315))
+            int imageHeight = 315;
+            int imageWidth = 828;
+
+            using (MagickImage image = new MagickImage(new MagickColor("#" + imageDefinition.bgColor), imageWidth, imageHeight))
             {
                 MagickColor mTextColor = new MagickColor("#" + imageDefinition.textColor);
+
+                int textOffset = imageHeight / 3;
 
                 new Drawables()
                     .FillColor(mTextColor)
@@ -29,10 +35,10 @@ namespace CurrentThreatLevel.Content.Controllers
                     .TextAlignment(TextAlignment.Left)
 
                     .FontPointSize(28)
-                    .Text(64, 105, "current threat level is " + imageDefinition.threatLevel)
+                    .Text(64, textOffset, "current threat level is " + imageDefinition.threatLevel)
 
                     .FontPointSize(20)
-                    .Text(64, 210, imageDefinition.text)
+                    .Text(64, textOffset * 2, imageDefinition.text)
 
                     .Draw(image);
 
@@ -44,14 +50,14 @@ namespace CurrentThreatLevel.Content.Controllers
             memStream.Position = 0;
 
             /* Required headers */
-            result = Request.CreateResponse(HttpStatusCode.OK);
-            result.Content = new StreamContent(memStream);
-            result.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
-            result.Content.Headers.ContentDisposition.FileName = this.getFileName(imageDefinition.threatLevel, imageDefinition.text) + ".png";
+            response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StreamContent(memStream);
+            response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
+            response.Content.Headers.ContentDisposition.FileName = this.getFileName(imageDefinition.threatLevel, imageDefinition.text) + ".png";
 
             System.Web.HttpContext.Current.Response.SetCookie(new System.Web.HttpCookie("fileDownload", "true") { Path = "/" });
 
-            return result;
+            return response;
         }
 
         private string getFileName(string threatLevel, string text)
